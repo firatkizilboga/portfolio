@@ -1,5 +1,5 @@
 #import static functions
-from brain import Brain
+from snake_game.brain import Brain
 class Snake():
     def __init__(self, brain = None):
         self.direction = [-1, 0]

@@ -1,6 +1,6 @@
 import numpy as np
-from snake import Snake
-import utils
+from snake_game.snake import Snake
+import snake_game.utils
 class Game():
     def __init__(self,width = 10, height = 10, snake = None):
         if snake is None:

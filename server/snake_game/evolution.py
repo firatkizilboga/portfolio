@@ -1,6 +1,6 @@
-from game import Game
-from snake import Snake
-from brain import Brain
+from snake_game.game import Game
+from snake_game.snake import Snake
+from snake_game.brain import Brain
 import time
 
 class Evolver():
@@ -70,7 +70,8 @@ class Evolver():
         
         self.order_population()
         self.playback()
-
+    def test(self):
+        return ["test!!","teaisda"]
 if __name__ == "__main__":
     evolver = Evolver()
     evolver.evolve()
