@@ -29,7 +29,15 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
-
+INTERNAL_IPS = [
+    '127.0.0.1',
+]
+DEBUG_TOOLBAR_CONFIG = {
+    'SHOW_TOOLBAR_CALLBACK': lambda request: True,
+}
+#cors headers
+CORS_ORIGIN_ALLOW_ALL = True
+APPEND_SLASH=False
 INSTALLED_APPS = [
     'corsheaders',
     'django.contrib.admin',
@@ -39,8 +47,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'api',
-    'snake_game'
+    'debug_toolbar',
+    'snakegame',
+    'django_extensions',
+
 ]
 
 MIDDLEWARE = [
@@ -52,6 +62,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+
 ]
 
 ROOT_URLCONF = 'server.urls'
