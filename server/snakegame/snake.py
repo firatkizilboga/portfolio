@@ -1,9 +1,12 @@
-#import static functions
-from snakegame.brain import Brain
+try:
+    from brain import Brain
+except ModuleNotFoundError:
+    from snakegame.brain import Brain
+
 class Snake():
     def __init__(self, brain = None):
         self.direction = [-1, 0]
-        self.cells = [[2,2],[2,3],[2,4],[2,5],[2,6],[2,7]]
+        self.cells = [[5,5]]
         if brain is None:
             self.brain = Brain()
         else:

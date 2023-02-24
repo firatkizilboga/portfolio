@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
-
+import time
 # Create your views here.
 #import evlolution from snake-game
 from snakegame.evolution import Evolver
@@ -12,7 +12,7 @@ class HelloView(APIView):
         return Response(Evolver().test())
 
 class EvolutionView(APIView):
-    def get(self, request):
+    def post(self, request):
         #validate the request's data and return the response
         #get the data from the request
         data = request.data
@@ -24,12 +24,17 @@ class EvolutionView(APIView):
         #make every snake play the game one more time
         
         frames = []
+        sorted_snakes = sorted(snakes, key = lambda snake: snake.fitness, reverse = True)
+        #print the average fitness of the top 5 snakes
+        print(sum([snake.fitness for snake in sorted_snakes[:5]])/5)
+        #print the average fitness of the bottom 5 snakes
+        print(sum([snake.fitness for snake in sorted_snakes[-5:]])/5)
+        snakes = [sorted_snakes[int(len(sorted_snakes)/5*i)] for i in range(5)]
         for i,snake in enumerate(snakes):
             game = Game()
-            game.snake = snake
-            while (not game.game_over) and (game.frames<600):
-                frames.append(game.step())
-            
+            game.snake.brain = snake.brain
+            while (not game.game_over) and (game.frames<200):
+                frames.append(game.step(playback=True))
         return Response(frames)
     
 

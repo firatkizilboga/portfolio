@@ -1,6 +1,11 @@
 import numpy as np
-from snakegame.snake import Snake
-from snakegame import utils
+try:
+    import utils
+    from snake import Snake
+except ModuleNotFoundError:
+    from snakegame import utils
+    from snakegame.snake import Snake
+
 class Game():
     def __init__(self,width = 10, height = 10, snake = None):
         if snake is None:
@@ -40,7 +45,7 @@ class Game():
         return False
     
     def check_snake_outside(self):
-        if self.snake.cells[-1][0] < 0 or self.snake.cells[-1][0] >= self.width or self.snake.cells[-1][1] < 0 or self.snake.cells[-1][1] >= self.height:
+        if self.snake.cells[-1][0] < 0 or self.snake.cells[-1][0] > self.width-1 or self.snake.cells[-1][1] < 0 or self.snake.cells[-1][1] > self.height-1:
             return True
         return False
         
@@ -50,7 +55,7 @@ class Game():
             return True
         return False
         
-    def step(self):
+    def step(self, playback = False):
         self.frames += 1
         vision = self.get_vision()
         
@@ -61,17 +66,26 @@ class Game():
 
         if self.check_snake_food_intersection():
             self.food = self.get_random_food()
-
-
-        return self.get_state()
+        if playback:
+            return self.get_state()
 
     def get_state(self):
-        return {
-            "food": self.food,
-            "snake": self.snake.cells,
-            "game_over": self.game_over,
-            "score": self.snake.score,
-        }
+        #return an array where empyt cells are 0, snake cells are 1 and food is 2
+        state = [
+
+        ]
+        for i in range(self.width):
+            row = []
+            for j in range(self.height):
+                if [i,j] in self.snake.cells:
+                    row.append(1)
+                elif [i,j] == self.food:
+                    row.append(2)
+                else:
+                    row.append(0)
+            state.append(row)
+        return state
+    
         
     def get_random_food(self):
         food = [np.random.randint(0, self.width), np.random.randint(0, self.height)]

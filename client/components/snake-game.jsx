@@ -1,114 +1,141 @@
-import { useEffect, useRef, useState } from "react";
+import { use, useEffect, useRef, useState } from "react";
 import getServerUrl from "utils/get_server_url";
 
-
-export function evolve(max_generations, population_size){
+export async function evolve(max_generations, population_size){
     //make a get request to the server endpoint /api/evolve
     var formdata = new FormData();
-    formdata.append(max_generations, "20");
-    formdata.append(population_size, "100");
+    formdata.append("max_generations", max_generations);
+    formdata.append("population_size", population_size);
     formdata.append("mutation_rate", "0.3");
 
+
     var requestOptions = {
-        method: 'GET',
+        method: 'POST',
         body: formdata,
         redirect: 'follow'
       };
     
-      
-    let games = fetch(getServerUrl("/api/snake-game/evolve/"), requestOptions)
-    .then(response => response.text())
-    .then(result => console.log(result))
+    let games = fetch(getServerUrl("api/snake-game/evolve/"), requestOptions)
+    .then(response => response.json())
+    .then(result => result)
     .catch(error => console.log('error', error));
-
+    //returns a list of games
+    console.log(games)
     return games
-}
-
-function playback(playbackData){
-    useEffect(() => {
-    
-        const initMatrix = [];
-        for (let i = 0; i < matrixHeight; i++) {
-          initMatrix[i] = [];
-          for (let j = 0; j < matrixWidth; j++) {
-            initMatrix[i][j] = 0;
-          }
-        }
-        setMatrix(initMatrix);
-      }, []);
-    
-      // iterate through playback data and update matrix
-      useEffect(() => {
-  
-        let index = 0;
-        const intervalId = setInterval(() => {
-          if (index >= playbackData.length) {
-            clearInterval(intervalId);
-            return;
-          }
-    
-          const frame = playbackData[index];
-          const newMatrix = [];
-          for (let i = 0; i < matrixHeight; i++) {
-            newMatrix[i] = [];
-            for (let j = 0; j < matrixWidth; j++) {
-              newMatrix[i][j] = 0;
-            }
-          }
-    
-          for (let [x, y] of frame.snake) {
-            newMatrix[y][x] = 1;
-          }
-          let [x, y] = frame.food;
-          newMatrix[y][x] = 1;
-    
-          setMatrix(newMatrix);
-          index++;
-        }, 500);
-    
-        // clear matrix when component unmounts or playbackData changes
-        return () => {
-          clearInterval(intervalId);
-          const clearMatrix = [];
-          for (let i = 0; i < matrixHeight; i++) {
-            clearMatrix[i] = [];
-            for (let j = 0; j < matrixWidth; j++) {
-              clearMatrix[i][j] = 0;
-            }
-          }
-          setMatrix(clearMatrix);
-        };
-      }, [playbackData]);  
-}
-
+};
 export default function SnakeGame() {
-    const evolveBtn = useRef();
-    let playbackData = [];
 
-    const matrixWidth = 20;
-    const matrixHeight = 20;
-    const [matrix, setMatrix] = useState([]);
+  let width = 10;
+  let height = 10;
 
-    // render matrix
-    return (
-      <div>
+  let [frames, setFrames] = useState([]);
+  //create a matrix full of zeros
+  let initial_frame = Array.from(Array(height), () => new Array(width).fill(0));
+  let [frame, setFrame] = useState(initial_frame);
+  let [frameId, setFrameId] = useState(0);
+  let evolveButtonRef = useRef();
+  let playRef = useRef();
 
-        <button
-        onClick={(event) => {playbackData = evolve(20,100)}}>
-            Evolve
-        </button>        
-        <button
-        onClick={playback}>
-            Playback
-        </button>
-
-        {matrix.map((row, i) => (
-          <div key={i}>
-            {row.map((cell, j) => (
-              <span key={`${i}-${j}`} className={cell === 1 ? 'snake' : 'empty'}></span>
-            ))}
-          </div>
-        ))}
-      </div>
-    );
+  let evolveHandleClick = async () => {
+    playRef.current.classList.add("disabled");
+      let max_generations = document.getElementsByName("max_generations")[0].value;
+      let population_size = document.getElementsByName("population_size")[0].value;
+      await evolve(max_generations, population_size).then((inc_frames) => {
+        setFrames(inc_frames);
+      });
+      playRef.current.classList.remove("disabled");
   }
+
+  const [isPlaying, setIsPlaying] = useState(false)
+  let playHandleClick = () => {
+    if (frames.length  == 1) {
+      return;
+    }else if (isPlaying) {
+      setIsPlaying(false);
+    }else{
+      setIsPlaying(true);
+    }
+  }
+  useEffect(() => {
+    if (isPlaying) {
+      playRef.current.innerHTML = "Pause";
+    }else{
+      playRef.current.innerHTML = "Play";
+    }
+  }, [isPlaying])
+  
+
+
+
+  useEffect(() => {
+      const interval = setInterval(() => {
+        if (frameId < frames.length && isPlaying) {
+          let current_frame = frames[frameId]
+          setFrame(current_frame);
+          setFrameId(frameId+1);
+          evolveButtonRef.current.innerHTML = `Evolve ${frameId}`;
+          //sleep for 1 second
+        }else{
+          clearInterval(interval);
+        }
+      }, 30);
+      return () => clearInterval(interval);
+
+  }, [isPlaying, frameId]);
+
+  return (
+    <div className="p-5">
+      <div className="align-items-center justify-content-evenly d-flex">
+        <div className="cell-matrix">
+          {frame.map((row, i) => {
+            return(
+              <div key={i} className="cell-row d-flex">{ 
+                    row.map((cell, j) => {
+                      return(
+                        <div key={`${i},${j}`} style={
+                          {
+                            width: `40px`,
+                            height: `40px`,
+                            //conditional background color
+                            backgroundColor: cell == 1 ? 'green' : cell == 2 ? 'red' : 'white'
+                          }
+                        }>
+                          {""}
+                        </div>
+                      )
+                    })}
+              </div>
+              )})}
+
+        </div>
+        <div className="">
+            <div className="mb-2">
+              <label htmlFor="max_generations">Number of generations</label><br />
+              <input type="number" min={20} name = "max_generations"/>
+            </div>
+            <div className="mb-2">
+              <label htmlFor="max_generations">Number of snakes in a generation</label><br />
+              <input type="number" min={40} name = "population_size"/>
+            </div>
+            <div className="align-items-center d-flex justify-items-between w-100">
+            <button
+              className="btn btn-primary"
+              ref={evolveButtonRef} 
+              onClick={evolveHandleClick}
+            >
+              Evolve
+              </button>
+              <button ref={playRef}
+              className="btn btn-danger disabled"
+              onClick={playHandleClick}
+              >
+              Play
+              </button>
+
+            </div>
+          </div>
+        </div>
+    </div>
+  );
+}
+
