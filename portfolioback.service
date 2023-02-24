@@ -1,0 +1,11 @@
+[Unit]
+Description=<project description>
+
+[Service]
+User=firat
+WorkingDirectory=/home/firat/portfolio/server
+ExecStart=/home/firat/portfolio/server/server_env/bin/python3 manage.py runserver 0.0.0.0:8000
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
