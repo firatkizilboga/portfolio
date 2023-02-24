@@ -1,5 +1,6 @@
 import { use, useEffect, useRef, useState } from "react";
 import getServerUrl from "utils/get_server_url";
+import scrollToSection from "utils/scroll_to_section";
 
 export async function evolve(max_generations, population_size, max_frames_training, max_frames_playback){
     //make a get request to the server endpoint /api/evolve
@@ -41,13 +42,14 @@ export default function SnakeGame() {
   let loaderRef = useRef();
 
   const [isPlaying, setIsPlaying] = useState(false)
-  let playHandleClick = () => {
+  let playHandleClick = (event) => {
     if (frames.length  == 1) {
       return;
     }else if (isPlaying) {
       setIsPlaying(false);
     }else{
       setIsPlaying(true);
+      scrollToSection(event,"snake-game")
     }
   }
 
@@ -120,7 +122,7 @@ export default function SnakeGame() {
   return (
     <div className="p-5 d-flex flex-wrap justify-content-evenly align-items-left">
         <div className="">
-          <div className="cell-matrix">
+          <div className="cell-matrix" id = "snake-game">
             {frame.map((row, i) => {
               return(
                 <div key={i} className="cell-row d-flex">{ 

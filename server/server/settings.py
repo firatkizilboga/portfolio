@@ -25,12 +25,13 @@ SECRET_KEY = 'django-insecure-4&!cbz_ze*gz-b+t$e$q9sd%x$=c!)gy1(a1ixe&x5p7b9$tzo
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['firatkizilboga.com']
+ALLOWED_HOSTS = ['firatkizilboga.com', 'localhost', '0.0.0.0', '127.0.0.1']
 
 
 # Application definition
 INTERNAL_IPS = [
     '127.0.0.1',
+    '0.0.0.0'
 ]
 DEBUG_TOOLBAR_CONFIG = {
     'SHOW_TOOLBAR_CALLBACK': lambda request: True,
