@@ -118,11 +118,11 @@ export default function SnakeGame() {
         <div className="snake-game-options">
             <div className="mb-2">
               <label htmlFor="max_generations">Number of generations</label><br />
-              <input type="number" min={20} name = "max_generations"/>
+              <input type="number" min={1} name = "max_generations"/>
             </div>
             <div className="mb-2">
               <label htmlFor="max_generations">Number of snakes in a generation</label><br />
-              <input type="number" min={40}  name = "population_size"/>
+              <input type="number" min={1}  name = "population_size"/>
             </div>
             <p>Beware! The higher these values, the longer it will take for the simulation to run.</p><br />
 
