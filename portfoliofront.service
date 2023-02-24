@@ -1,0 +1,12 @@
+[Unit]
+Description=NodeJS server, NextJS public frontend
+
+[Service]
+Restart=on-failure
+RestartSec=10
+WorkingDirectory=/home/firat/portfolio/client
+ExecStart=npm run dev
+
+[Install]
+WantedBy=multi-user.target
+
