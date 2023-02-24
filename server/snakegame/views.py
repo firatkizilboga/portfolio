@@ -24,13 +24,10 @@ class EvolutionView(APIView):
         #make every snake play the game one more time
         
         frames = []
-        sorted_snakes = sorted(snakes, key = lambda snake: snake.fitness, reverse = True)
+        sorted_snakes = sorted(snakes, key = lambda snake: snake.fitness)
         #print the average fitness of the top 5 snakes
-        print(sum([snake.fitness for snake in sorted_snakes[:5]])/5)
-        #print the average fitness of the bottom 5 snakes
-        print(sum([snake.fitness for snake in sorted_snakes[-5:]])/5)
         snakes = [sorted_snakes[int(len(sorted_snakes)/5*i)] for i in range(5)]
-        for i,snake in enumerate(snakes):
+        for i,snake in enumerate(snakes[::-1]):
             game = Game()
             game.snake.brain = snake.brain
             while (not game.game_over) and (game.frames<200):

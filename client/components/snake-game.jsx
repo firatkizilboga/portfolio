@@ -36,16 +36,6 @@ export default function SnakeGame() {
   let evolveButtonRef = useRef();
   let playRef = useRef();
 
-  let evolveHandleClick = async () => {
-    playRef.current.classList.add("disabled");
-      let max_generations = document.getElementsByName("max_generations")[0].value;
-      let population_size = document.getElementsByName("population_size")[0].value;
-      await evolve(max_generations, population_size).then((inc_frames) => {
-        setFrames(inc_frames);
-      });
-      playRef.current.classList.remove("disabled");
-  }
-
   const [isPlaying, setIsPlaying] = useState(false)
   let playHandleClick = () => {
     if (frames.length  == 1) {
@@ -56,6 +46,7 @@ export default function SnakeGame() {
       setIsPlaying(true);
     }
   }
+
   useEffect(() => {
     if (isPlaying) {
       playRef.current.innerHTML = "Pause";
@@ -63,10 +54,20 @@ export default function SnakeGame() {
       playRef.current.innerHTML = "Play";
     }
   }, [isPlaying])
+
+  let evolveHandleClick = async () => {
+    if (!isPlaying) {
+      playRef.current.classList.add("disabled");
+      let max_generations = document.getElementsByName("max_generations")[0].value;
+      let population_size = document.getElementsByName("population_size")[0].value;
+      setFrameId(0);
+      await evolve(max_generations, population_size).then((inc_frames) => {
+        setFrames(inc_frames);
+      });
+      playRef.current.classList.remove("disabled");
+    }
+  }
   
-
-
-
   useEffect(() => {
       const interval = setInterval(() => {
         if (frameId < frames.length && isPlaying) {
@@ -115,7 +116,7 @@ export default function SnakeGame() {
             </div>
             <div className="mb-2">
               <label htmlFor="max_generations">Number of snakes in a generation</label><br />
-              <input type="number" min={40} name = "population_size"/>
+              <input type="number" min={40}  name = "population_size"/>
             </div>
             <div className="align-items-center d-flex justify-items-between w-100">
             <button

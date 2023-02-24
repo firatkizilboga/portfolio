@@ -14,7 +14,7 @@ class Brain():
         #multiply inputs by weights and add bias for every layer
         xw=np.array(inputs).ravel()
         for weights, bias in zip(self.weights, self.bias):
-            xw = np.dot(xw,weights) + bias
+            xw = np.dot(xw,weights) #+ bias
         xw=xw.reshape(-1,1).tolist()
         #make the biggest value 1 and the rest 0
         xw[xw.index(max(xw))]=1
