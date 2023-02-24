@@ -9,8 +9,8 @@ export default function Header() {
             <div className='d-flex align-items-center justify-content-between flex-wrap snakegame-grid'>
                     <Link 
                     href="/"
-                        ><h1>
-                            &gt;&gt;&gt; Our.Portfolio(&#128293;)
+                        ><h1 className='headerTitle'>
+                            &gt;&gt;&gt; firat.Portfolio(&#128293;)
                         </h1>
                     </Link>
 

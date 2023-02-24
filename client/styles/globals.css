@@ -10,6 +10,13 @@
   --color-green: #a7c957;
   --color-red: #ef233c;
 }
+@media screen and (max-width:400){
+  h1{
+    font-size: 20px !important;
+    
+  }
+}
+  
 
 body{
     background-color: var(--color-black);
