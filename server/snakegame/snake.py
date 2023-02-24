@@ -85,10 +85,10 @@ class Snake():
 
     
     
-    def mutate(self):
+    def mutate(self, mutation_rate):
         #copy self  and mutate the copy
         snake = Snake()
-        snake.brain = self.brain.mutate()
+        snake.brain = self.brain.mutate(mutation_rate)
         return snake
 
     #less than operator

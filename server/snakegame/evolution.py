@@ -8,7 +8,8 @@ class Evolver():
         self.population_size = 100
         self.max_generations = 300
         self.mutation_rate = 0.3
-
+        self.max_frames_playback = 600
+        self.max_frames_training = 300
         self.generation = 0
         self.population = []
         
@@ -23,7 +24,7 @@ class Evolver():
             game = Game()
             game.snake = snake
             frames = 0
-            while (not game.game_over) and (game.frames < 200):
+            while (not game.game_over) and (game.frames < self.max_frames_training):
                 game.step()
             game.snake = snake
             game.snake.fitness = game.fitness()
@@ -44,7 +45,7 @@ class Evolver():
         game = Game()
         game.snake = self.population[0]
         frame = 0
-        while (not game.game_over) and (game.frames<600):
+        while (not game.game_over) and (game.frames<self.max_frames_playback):
             game.display()
             self.print_stats()
             time.sleep(0.05)
@@ -69,14 +70,11 @@ class Evolver():
             for i in range(int(self.population_size * 0.2)):
                 new_population.append(self.population[i])
                 for _ in range(4):
-                    snake = self.population[i].mutate()
+                    snake = self.population[i].mutate(self.mutation_rate)
                     new_population.append(snake)
             self.population = new_population
             self.reset_population()
-
-        
-            if self.generation % 10 == 0:
-                snakes.append(self.population[0])
+            snakes.append(self.population[0])
         return snakes
     
     def test(self):
@@ -89,6 +87,9 @@ class Evolver():
         evolver.population_size = int(json["population_size"])
         evolver.max_generations = int(json["max_generations"])
         evolver.mutation_rate = float(json["mutation_rate"])
+        evolver.max_frames_playback = int(json["max_frames_playback"])
+        evolver.max_frames_training = int(json["max_frames_training"])
+
         return evolver
     
     def to_json(self):
@@ -96,8 +97,8 @@ class Evolver():
             "population_size": self.population_size,
             "max_generations": self.max_generations,
             "mutation_rate": self.mutation_rate,
-
         }
+    
 if __name__ == "__main__":
     evolver = Evolver()
     evolver.evolve()

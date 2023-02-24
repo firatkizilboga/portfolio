@@ -1,11 +1,14 @@
 import { use, useEffect, useRef, useState } from "react";
 import getServerUrl from "utils/get_server_url";
 
-export async function evolve(max_generations, population_size){
+export async function evolve(max_generations, population_size, max_frames_training, max_frames_playback){
     //make a get request to the server endpoint /api/evolve
     var formdata = new FormData();
     formdata.append("max_generations", max_generations);
     formdata.append("population_size", population_size);
+    formdata.append("max_frames_training", max_frames_training);
+    formdata.append("max_frames_playback", max_frames_playback);
+    
     formdata.append("mutation_rate", "0.3");
 
 
@@ -35,6 +38,7 @@ export default function SnakeGame() {
   let [frameId, setFrameId] = useState(0);
   let evolveButtonRef = useRef();
   let playRef = useRef();
+  let loaderRef = useRef();
 
   const [isPlaying, setIsPlaying] = useState(false)
   let playHandleClick = () => {
@@ -62,14 +66,37 @@ export default function SnakeGame() {
       playRef.current.classList.add("disabled");
       evolveButtonRef.current.innerHTML = "Evolving...";
       evolveButtonRef.current.classList.add("disabled");
+      loaderRef.current.classList.remove("invisible");
+      
       let max_generations = document.getElementsByName("max_generations")[0].value;
       let population_size = document.getElementsByName("population_size")[0].value;
+      let max_frames_training = document.getElementsByName("max_frames_training")[0].value;
+      let max_frames_playback = document.getElementsByName("max_frames_playback")[0].value;
+      let mutation_rate = document.getElementsByName("mutation_rate")[0].value;
+
+      if (max_generations == "") {
+        max_generations = "20";
+      }
+      if (population_size == "") {
+        population_size = "50";
+      }
+      if (max_frames_training == "") {
+        max_frames_training = "200";
+      }
+      if (max_frames_playback == "") {
+        max_frames_playback = "200";
+      }
+      if (mutation_rate == "") {
+        mutation_rate = "0.3";
+      }
+
       setFrameId(0);
-      await evolve(max_generations, population_size).then((inc_frames) => {
+      await evolve(max_generations, population_size, max_frames_training, max_frames_playback).then((inc_frames) => {
         setFrames(inc_frames);
       });
       evolveButtonRef.current.innerHTML = "Complete!";
       playRef.current.classList.remove("disabled");
+      loaderRef.current.classList.add("invisible");
     }
   }
   
@@ -83,7 +110,7 @@ export default function SnakeGame() {
         }else{
           clearInterval(interval);
         }
-      }, 30);
+      }, 15);
       return () => {
         clearInterval(interval);
       };
@@ -115,25 +142,54 @@ export default function SnakeGame() {
           </div>
           <br />
         </div>
-        <div className="snake-game-options">
-            <div className="mb-2">
-              <label htmlFor="max_generations">Number of generations</label><br />
-              <input type="number" min={1} name = "max_generations"/>
+        <div className="snake-game-options d-flex flex-wrap">
+          <div>
+            <div className="m-2">
+              <label htmlFor="max_generations">Maximum frame count in training</label><br />
+              <input type="number" min={200} placeholder="type here min(200)" name = "max_frames_training"/>
             </div>
-            <div className="mb-2">
-              <label htmlFor="max_generations">Number of snakes in a generation</label><br />
-              <input type="number" min={1}  name = "population_size"/>
+
+            <div className="m-2">
+              <label htmlFor="max_generations">Maximum frame count in playback</label><br />
+              <input type="number" min={200}  placeholder="type here min(200)" name = "max_frames_playback"/>
             </div>
-            <p>Beware! The higher these values, the longer it will take for the simulation to run.</p><br />
+          </div>
+
+            <div>
+              <div className="m-2">
+                <label htmlFor="max_generations">Number of generations</label><br />
+                <input type="number" min={1} placeholder="type here" name = "max_generations"/>
+              </div>
+              <div className="m-2">
+                <label htmlFor="max_generations">Number of snakes in a generation</label><br />
+                <input type="number" min={1}  placeholder="type here" name = "population_size"/>
+              </div>
+              <div className="m-2">
+                <label htmlFor="max_generations">Mutation rate</label><br />
+                <input type="number" step="0.1" placeholder="0,2" name="mutation_rate" min={0} max={1}/>
+              </div>
+
+
+
+
+            <p>Beware! The higher these values, <br />
+              the longer it will take for the simulation to run.</p>
+            </div>
 
             <div className="align-items-center d-flex justify-items-between w-100">
-            <button
-              className=""
-              ref={evolveButtonRef} 
-              onClick={evolveHandleClick}
-            >
-              Evolve
-              </button>
+              <div>
+                <button
+                className=""
+                ref={evolveButtonRef} 
+                onClick={evolveHandleClick}
+              >
+                Evolve
+                </button>
+                <div class="loader invisible" ref={loaderRef}>
+                  <div class="loaderBar"></div>
+                </div>
+              </div>
+            
               
               <button ref={playRef}
                 className="disabled red"
