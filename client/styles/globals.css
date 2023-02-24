@@ -55,7 +55,7 @@ max-width: 500px;
         min-height: 20px;
     }
     .cell-matrix{
-      border: var(--color-purple) 10px solid;
+      border: var(--color-purple) 20px solid;
       border-radius: 20px;
   }
   
