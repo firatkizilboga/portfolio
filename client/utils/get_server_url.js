@@ -6,5 +6,5 @@ export default function getServerUrl(path) {
         path = "";
     }
 
-    return "http://firatkizilboga.com:8000/"+path;
+    return "http://127.0.0.1:8000/"+path;
 }

@@ -4,11 +4,11 @@ except ModuleNotFoundError:
     from snakegame.brain import Brain
 
 class Snake():
-    def __init__(self, brain = None):
+    def __init__(self, brain = None, network_arch = None):
         self.direction = [-1, 0]
         self.cells = [[5,5]]
         if brain is None:
-            self.brain = Brain()
+            self.brain = Brain(network_arch)
         else:
             self.brain = brain
         self.score = 0
@@ -30,6 +30,7 @@ class Snake():
     
     def step(self, vision, food_location):
         new_direction = self.brain.predict(vision)
+
         if new_direction == [0,1,0]:
             new_direction = "forward"
         elif new_direction == [1,0,0]:

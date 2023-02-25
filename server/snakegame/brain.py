@@ -1,10 +1,17 @@
 import numpy as np
 #implements the desicion making of the snake
 class Brain():
-    def __init__(self):
-        self.weights = [np.random.rand(9, 3), #input layer
-                        np.random.rand(3,3), #output layer
-                    ]
+    def __init__(self, network_arch):
+        if network_arch is None:
+            network_arch = [9, 3]
+        
+        self.network_arch = network_arch
+        for i in range(len(network_arch)-1):
+            if i==0:
+                self.weights = [np.random.rand(network_arch[i], network_arch[i+1])]
+            else:
+                self.weights.append(np.random.rand(network_arch[i], network_arch[i+1]))
+
 
     def predict(self, inputs):
         #multiply inputs by weights and add bias for every layer
@@ -29,7 +36,7 @@ class Brain():
     
     @staticmethod
     def from_json(json):
-        brain = Brain()
+        brain = Brain(json["network_arch"])
         brain.weights = json["weights"]
         for l, layer in enumerate(brain.weights):
             brain.weights[l] = np.array(layer)
@@ -45,7 +52,7 @@ class Brain():
                     if np.random.rand() < mutation_rate:
                         row[i] += np.random.rand()
         #create a new brain
-        brain = Brain()
+        brain = Brain(self.network_arch)
         brain.weights = weights
 
         return brain

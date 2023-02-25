@@ -14,12 +14,12 @@ class Evolver():
         self.max_frames_training = 300
         self.generation = 0
         self.population = []
-        
+        self.network_arch = [9, 3]
+    
+    def create_population(self):
         for _ in range(self.population_size):
-            snake = Snake()
-            snake.brain = Brain()
+            snake = Snake(network_arch = self.network_arch)
             self.population.append(snake)
-
 
     def simulate_generation(self):
         for snake in self.population:
@@ -88,10 +88,35 @@ class Evolver():
     def from_json(json):
         evolver = Evolver()
         evolver.population_size = int(json["population_size"])
+        if evolver.population_size > 200:
+            evolver.population_size = 200
+
         evolver.max_generations = int(json["max_generations"])
+        if evolver.max_generations > 100:
+            evolver.max_generations = 100
         evolver.mutation_rate = float(json["mutation_rate"])
+        if evolver.mutation_rate > 1:
+            evolver.mutation_rate = 1
+        
         evolver.max_frames_playback = int(json["max_frames_playback"])
+        if evolver.max_frames_playback > 1000:
+            evolver.max_frames_playback = 1000
+
         evolver.max_frames_training = int(json["max_frames_training"])
+        if evolver.max_frames_training > 1000:
+            evolver.max_frames_training = 1000
+
+
+        evolver.network_arch = json.get("network_arch")
+        if evolver.network_arch:
+            evolver.network_arch = evolver.network_arch.split(",")
+            for i,num in enumerate(evolver.network_arch):
+                evolver.network_arch[i] = int(num)
+        else:
+            evolver.network_arch = []
+                
+        evolver.network_arch = [9] + evolver.network_arch + [3]
+        evolver.create_population()
 
         return evolver
     

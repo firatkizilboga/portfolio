@@ -13,10 +13,8 @@
 @media screen and (max-width:400){
   h1{
     font-size: 20px !important;
-    
   }
 }
-  
 
 body{
     background-color: var(--color-black);
@@ -96,6 +94,12 @@ max-width: 500px;
   background-color: var(--color-apricot);
 }
 
+input[type='number']::-webkit-inner-spin-button, 
+input[type='number']::-webkit-outer-spin-button { 
+    -webkit-appearance: none;
+    margin: 0;
+}
+
 input{
   background-color: transparent;
   color: var(--color-apricot);
@@ -104,7 +108,21 @@ input{
 
   font-size: larger;
 }
-
+input.node{
+  border: 1px solid var(--color-flame);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  text-align: center;
+}
+div.node{
+  border: 1px solid var(--color-green);
+  min-width: 40px;
+  min-height: 40px;
+  border-radius: 50%;
+  text-align: center;
+  font-size: 20px;
+}
 button{
   background-color: var(--color-green);
   color: var(--color-white);

@@ -1,8 +1,9 @@
 import { use, useEffect, useRef, useState } from "react";
 import getServerUrl from "utils/get_server_url";
 import scrollToSection from "utils/scroll_to_section";
+import React from "react";
 
-export async function evolve(max_generations, population_size, max_frames_training, max_frames_playback,mutation_rate){
+export async function evolve(max_generations, population_size, max_frames_training, max_frames_playback,mutation_rate, hidden_layers){
     //make a get request to the server endpoint /api/evolve
     var formdata = new FormData();
     formdata.append("max_generations", max_generations);
@@ -10,14 +11,17 @@ export async function evolve(max_generations, population_size, max_frames_traini
     formdata.append("max_frames_training", max_frames_training);
     formdata.append("max_frames_playback", max_frames_playback);
     formdata.append("mutation_rate", mutation_rate);
-
+    if (hidden_layers != null){
+      formdata.append("network_arch", hidden_layers);
+    }
+    console.log(hidden_layers)
 
     var requestOptions = {
-        method: 'POST',
-        body: formdata,
-        redirect: 'follow'
-      };
-    
+      method: 'POST',
+      body: formdata,
+      redirect: 'follow'
+    };
+
     let games = fetch(getServerUrl("api/snake-game/evolve/"), requestOptions)
     .then(response => response.json())
     .then(result => result)
@@ -27,6 +31,32 @@ export async function evolve(max_generations, population_size, max_frames_traini
     return games
 };
 export default function SnakeGame() {
+  const Node = () => {
+    return(
+      <div className=" hidden-layer d-flex w-100 align-items-center">
+          <input type="number" class="node" name = "hidden_layer" placeholder="3" onChange={handleNodeChange}/>
+          <div className="divider w-100"/>
+      </div>
+    )
+  }
+  
+  
+  const addNode = (event) => {
+    setHiddenLayers([...hiddenLayers, <Node />]);
+  }
+
+  const handleNodeChange = (event) => {
+    let node = event.target;
+    let parent = node.parentNode;
+    let value = node.value;
+    if (value < 1) {
+      const index = hiddenLayers.indexOf(node);
+      if (index > -1) { // only splice array when item is found
+        hiddenLayers.splice(index, 1); // 2nd parameter means remove one item only
+      }
+      setHiddenLayers([...hiddenLayers]);
+    }
+  }
 
   let width = 10;
   let height = 10;
@@ -39,6 +69,19 @@ export default function SnakeGame() {
   let evolveButtonRef = useRef();
   let playRef = useRef();
   let loaderRef = useRef();
+
+  const [hiddenLayers, setHiddenLayers] = useState([]);
+  const addNodeButtonRef = useRef();
+
+  useEffect(() => {
+    if (hiddenLayers.length<3){
+      addNodeButtonRef.current.classList.remove("d-none");
+    } else {
+      addNodeButtonRef.current.classList.add("d-none");
+    }
+  }, [hiddenLayers])
+  
+  
 
   const [isPlaying, setIsPlaying] = useState(false)
   let playHandleClick = (event) => {
@@ -74,7 +117,12 @@ export default function SnakeGame() {
       let max_frames_training = document.getElementsByName("max_frames_training")[0].value;
       let max_frames_playback = document.getElementsByName("max_frames_playback")[0].value;
       let mutation_rate = document.getElementsByName("mutation_rate")[0].value;
-
+      let hidden_layer_nodes = document.getElementsByName("hidden_layer");
+      let hidden_layer_values = [];
+      for (let i = 0; i < hidden_layer_nodes.length; i++) {
+        hidden_layer_values.push(hidden_layer_nodes[i].value ? hidden_layer_nodes[i].value : '3');
+      }
+      
       if (max_generations == "") {
         max_generations = "20";
       }
@@ -90,11 +138,16 @@ export default function SnakeGame() {
       if (mutation_rate == "") {
         mutation_rate = "0.3";
       }
+      if (hidden_layer_values.length == 0) {
+        hidden_layer_values = null;
+      }
 
-      setFrameId(0);
-      await evolve(max_generations, population_size, max_frames_training, max_frames_playback, mutation_rate).then((inc_frames) => {
+
+      await evolve(max_generations, population_size, max_frames_training, max_frames_playback, mutation_rate, hidden_layer_values).then((inc_frames) => {
         setFrames(inc_frames);
       });
+
+      setFrameId(0);
       evolveButtonRef.current.innerHTML = "Complete!";
       playRef.current.classList.remove("disabled");
       loaderRef.current.classList.add("invisible");
@@ -111,7 +164,7 @@ export default function SnakeGame() {
         }else{
           clearInterval(interval);
         }
-      }, 500);
+      }, 100);
       return () => {
         clearInterval(interval);
       };
@@ -143,18 +196,31 @@ export default function SnakeGame() {
           </div>
           <br />
         </div>
-        <div className="snake-game-options d-flex flex-wrap">
-          <div>
-            <div className="m-2">
-              <label htmlFor="max_generations">Maximum frame count in training</label><br />
-              <input type="number" min={200} placeholder="type here min(200)" name = "max_frames_training"/>
+        <div className="snake-game-options">
+          <p>Neural Network Architecture</p>
+          <div className="neural-net-options d-flex align-items-center">
+            <div className=" input-layer d-flex w-100 align-items-center">
+              <input type="number" class="node" value={9} name = "input_layer" disabled/>
+              <div className="divider w-100"/>
             </div>
-
-            <div className="m-2">
-              <label htmlFor="max_generations">Maximum frame count in playback</label><br />
-              <input type="number" min={200}  placeholder="type here min(200)" name = "max_frames_playback"/>
+            {hiddenLayers}
+            <div type="button" class="node text-center justify-content-center align-items-center d-flex" ref = {addNodeButtonRef} onClick={addNode}>+</div>
+            <div className="divider w-100"/>
+            <div className=" output-layer">
+                <input type="number" class="node" value={3} name = "output_layer" disabled/>
             </div>
           </div>
+
+            <div>
+              <div className="m-2">
+                <label htmlFor="max_frames_training">Maximum frame count in training</label><br />
+                <input type="number" min={200} placeholder="type here min(200)" name = "max_frames_training"/>
+              </div>
+              <div className="m-2">
+                <label htmlFor="max_frames_playback">Maximum frame count in playback</label><br />
+                <input type="number" min={200}  placeholder="type here min(200)" name = "max_frames_playback"/>
+              </div>
+            </div>
 
             <div>
               <div className="m-2">
@@ -162,11 +228,11 @@ export default function SnakeGame() {
                 <input type="number" min={1} placeholder="type here" name = "max_generations"/>
               </div>
               <div className="m-2">
-                <label htmlFor="max_generations">Number of snakes in a generation</label><br />
+                <label htmlFor="population_size">Number of snakes in a generation</label><br />
                 <input type="number" min={1}  placeholder="type here" name = "population_size"/>
               </div>
               <div className="m-2">
-                <label htmlFor="max_generations">Mutation rate</label><br />
+                <label htmlFor="mutation_rate">Mutation rate</label><br />
                 <input type="number" step="0.1" placeholder="0,2" name="mutation_rate" min={0} max={1}/>
               </div>
 
