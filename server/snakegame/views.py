@@ -7,10 +7,6 @@ import time
 from snakegame.evolution import Evolver
 from snakegame.game import Game
 
-class HelloView(APIView):
-    def get(self, request):
-        return Response(Evolver().test())
-
 class EvolutionView(APIView):
     def post(self, request):
         #validate the request's data and return the response
@@ -26,7 +22,7 @@ class EvolutionView(APIView):
         frames = []
         sorted_snakes = sorted(snakes, key = lambda snake: snake.fitness)
         snakes = [sorted_snakes[int(len(sorted_snakes)/5*i)] for i in range(5)]
-        for i,snake in enumerate(snakes[::-1]):
+        for i,snake in enumerate(snakes):
             print(snake.fitness)
             game = Game()
             game.snake.brain = snake.brain

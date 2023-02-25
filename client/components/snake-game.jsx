@@ -2,15 +2,14 @@ import { use, useEffect, useRef, useState } from "react";
 import getServerUrl from "utils/get_server_url";
 import scrollToSection from "utils/scroll_to_section";
 
-export async function evolve(max_generations, population_size, max_frames_training, max_frames_playback){
+export async function evolve(max_generations, population_size, max_frames_training, max_frames_playback,mutation_rate){
     //make a get request to the server endpoint /api/evolve
     var formdata = new FormData();
     formdata.append("max_generations", max_generations);
     formdata.append("population_size", population_size);
     formdata.append("max_frames_training", max_frames_training);
     formdata.append("max_frames_playback", max_frames_playback);
-    
-    formdata.append("mutation_rate", "0.3");
+    formdata.append("mutation_rate", mutation_rate);
 
 
     var requestOptions = {
@@ -93,7 +92,7 @@ export default function SnakeGame() {
       }
 
       setFrameId(0);
-      await evolve(max_generations, population_size, max_frames_training, max_frames_playback).then((inc_frames) => {
+      await evolve(max_generations, population_size, max_frames_training, max_frames_playback, mutation_rate).then((inc_frames) => {
         setFrames(inc_frames);
       });
       evolveButtonRef.current.innerHTML = "Complete!";
@@ -112,7 +111,7 @@ export default function SnakeGame() {
         }else{
           clearInterval(interval);
         }
-      }, 15);
+      }, 500);
       return () => {
         clearInterval(interval);
       };
