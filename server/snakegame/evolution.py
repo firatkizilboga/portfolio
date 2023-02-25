@@ -1,10 +1,12 @@
 from snakegame.game import Game
 from snakegame.snake import Snake
 from snakegame.brain import Brain
+import numpy as np
 import time
 
 class Evolver():
     def __init__(self):
+        np.random.seed(42)
         self.population_size = 100
         self.max_generations = 300
         self.mutation_rate = 0.3

@@ -181,12 +181,12 @@ class Game():
             go=-1000
         else:
             go=0
-        if self.seen_food and self.snake.score == 0:
-            sf = -10
+        if self.snake.score > 2:
+            sf = 1000
         else:
             sf = 0
 
-        return self.snake.score*10 - self.frames_not_eaten * 2 + go + len(self.snake.unique_cell_discovered)*2 + sf
+        return self.snake.score*100 - self.frames_not_eaten + go + len(self.snake.unique_cell_discovered)*1.5 + sf
     
 if __name__ == "__main__":
     game = Game()
