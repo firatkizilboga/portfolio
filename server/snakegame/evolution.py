@@ -77,6 +77,7 @@ class Evolver():
             self.population = new_population
             self.reset_population()
             snakes.append(self.population[0])
+            
         return snakes
     
     def test(self):

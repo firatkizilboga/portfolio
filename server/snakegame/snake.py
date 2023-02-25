@@ -18,8 +18,10 @@ class Snake():
 
     def reset(self):
         brain = self.brain
+        fitness = self.fitness
         self.__init__()
         self.brain = brain
+        self.fitness = fitness
 
     def check_snake_food_intersection(self, food_location):
         if (self.cells[-1][0] == food_location[0]) and (self.cells[-1][1] == food_location[1]):
