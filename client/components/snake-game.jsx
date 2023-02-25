@@ -34,7 +34,7 @@ export default function SnakeGame() {
   const Node = () => {
     return(
       <div key={hiddenLayers.length} className=" hidden-layer d-flex w-100 align-items-center">
-          <input type="number" class="node" name = "hidden_layer" placeholder="3" onChange={handleNodeChange}/>
+          <input type="number" className="node" name = "hidden_layer" placeholder="3" onChange={handleNodeChange}/>
           <div className="divider w-100"/>
       </div>
     )
@@ -200,14 +200,14 @@ export default function SnakeGame() {
           <p>Neural Network Architecture</p>
           <div className="neural-net-options d-flex align-items-center">
             <div className=" input-layer d-flex w-100 align-items-center">
-              <input type="number" class="node" value={9} name = "input_layer" disabled/>
+              <input type="number" className="node" value={9} name = "input_layer" disabled/>
               <div className="divider w-100"/>
             </div>
             {hiddenLayers}
-            <div type="button" class="node text-center justify-content-center align-items-center d-flex" ref = {addNodeButtonRef} onClick={addNode}>+</div>
+            <div type="button" className="node text-center justify-content-center align-items-center d-flex" ref = {addNodeButtonRef} onClick={addNode}>+</div>
             <div className="divider w-100"/>
             <div className=" output-layer">
-                <input type="number" class="node" value={3} name = "output_layer" disabled/>
+                <input type="number" className="node" value={3} name = "output_layer" disabled/>
             </div>
           </div>
 
@@ -252,8 +252,8 @@ export default function SnakeGame() {
               >
                 Evolve
                 </button>
-                <div class="loader invisible" ref={loaderRef}>
-                  <div class="loaderBar"></div>
+                <div className="loader invisible" ref={loaderRef}>
+                  <div className="loaderBar"></div>
                 </div>
               </div>
             
