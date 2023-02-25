@@ -33,7 +33,7 @@ export async function evolve(max_generations, population_size, max_frames_traini
 export default function SnakeGame() {
   const Node = () => {
     return(
-      <div key = {hiddenLayers.length} className=" hidden-layer d-flex w-100 align-items-center">
+      <div className=" hidden-layer d-flex w-100 align-items-center">
           <input type="number" className="node" name = "hidden_layer" placeholder="3" onChange={handleNodeChange}/>
           <div className="divider w-100"/>
       </div>
@@ -42,7 +42,7 @@ export default function SnakeGame() {
   
   
   const addNode = (event) => {
-    setHiddenLayers([...hiddenLayers, <Node />]);
+    setHiddenLayers([...hiddenLayers, <Node key = {hiddenLayers.length} />]);
   }
 
   const handleNodeChange = (event) => {
