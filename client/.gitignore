@@ -30,4 +30,4 @@ yarn-error.log*
 
 # vercel
 .vercel
-/client/utils/get_server_url.js
+client/utils/get_server_url.js
