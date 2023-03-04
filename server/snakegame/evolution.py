@@ -3,12 +3,14 @@ from snakegame.snake import Snake
 from snakegame.brain import Brain
 import numpy as np
 import time
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 class Evolver():
     def __init__(self):
         np.random.seed(42)
         self.population_size = 100
-        self.max_generations = 300
+        self.max_generations = 10
         self.mutation_rate = 0.3
         self.max_frames_playback = 600
         self.max_frames_training = 300
@@ -55,30 +57,36 @@ class Evolver():
             frame += 1
 
 
-        
     def reset_population(self):
         for snake in self.population:
             snake.reset()
 
-    def evolve(self):
-        snakes = []
+    def step(self):
+        self.simulate_generation()
+        self.order_population()
+        
+        snake = self.population[0]
+        snake.reset()
+        game = Game(snake=snake)
+        game.snake.brain = snake.brain
+        frames = []
+        while (not game.game_over) and (game.frames<self.max_frames_playback):
+            frames.append(game.step(playback=True))
+        new_population = []
+        #mutate the top %20 of population
+        for i in range(int(self.population_size * 0.2)):
+            new_population.append(self.population[i])
+            for _ in range(4):
+                snake = self.population[i].mutate(self.mutation_rate)
+                new_population.append(snake)
+        self.population = new_population
+        self.reset_population()
+        return frames
 
+    def evolve(self):
         while self.generation < self.max_generations:
-            self.simulate_generation()
-            self.order_population()
-            self.print_stats()
-            new_population = []
-            #mutate the top %20 of population
-            for i in range(int(self.population_size * 0.2)):
-                new_population.append(self.population[i])
-                for _ in range(4):
-                    snake = self.population[i].mutate(self.mutation_rate)
-                    new_population.append(snake)
-            self.population = new_population
-            self.reset_population()
-            snakes.append(self.population[0])
-            
-        return snakes
+            self.step()
+
     
     def test(self):
         return ["test!!","teaisda"]
@@ -117,9 +125,8 @@ class Evolver():
                 
         evolver.network_arch = [9] + evolver.network_arch + [3]
         evolver.create_population()
-
         return evolver
-    
+
     def to_json(self):
         return {
             "population_size": self.population_size,

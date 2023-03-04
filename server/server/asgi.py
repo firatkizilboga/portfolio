@@ -1,16 +1,21 @@
-"""
-ASGI config for server project.
+from django.core.handlers.asgi import ASGIHandler
+from channels.routing import ProtocolTypeRouter, URLRouter
+from channels.auth import AuthMiddlewareStack
+from django.urls import path
 
-It exposes the ASGI callable as a module-level variable named ``application``.
+from snakegame.consumers import EvolutionConsumer
 
-For more information on this file, see
-https://docs.djangoproject.com/en/3.2/howto/deployment/asgi/
-"""
+application = ProtocolTypeRouter({
+    "http": ASGIHandler(),
+    "websocket": AuthMiddlewareStack(
+        URLRouter([
+            path("ws/evolve", EvolutionConsumer.as_asgi()),
+        ])
+    ),
+})
 
-import os
 
-from django.core.asgi import get_asgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'server.settings')
-
-application = get_asgi_application()
+# add the following lines to properly shut down the ASGIStaticFilesHandler
+from django.contrib.staticfiles.handlers import ASGIStaticFilesHandler
+application = ASGIStaticFilesHandler(application)

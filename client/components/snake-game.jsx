@@ -3,34 +3,35 @@ import getServerUrl from "utils/get_server_url";
 import scrollToSection from "utils/scroll_to_section";
 import React from "react";
 
-export async function evolve(max_generations, population_size, max_frames_training, max_frames_playback,mutation_rate, hidden_layers){
-    //make a get request to the server endpoint /api/evolve
-    var formdata = new FormData();
-    formdata.append("max_generations", max_generations);
-    formdata.append("population_size", population_size);
-    formdata.append("max_frames_training", max_frames_training);
-    formdata.append("max_frames_playback", max_frames_playback);
-    formdata.append("mutation_rate", mutation_rate);
-    if (hidden_layers != null){
-      formdata.append("network_arch", hidden_layers);
-    }
-    console.log(hidden_layers)
 
-    var requestOptions = {
-      method: 'POST',
-      body: formdata,
-      redirect: 'follow'
-    };
-
-    let games = fetch(getServerUrl("api/snake-game/evolve/"), requestOptions)
-    .then(response => response.json())
-    .then(result => result)
-    .catch(error => console.log('error', error));
-    //returns a list of games
-    console.log(games)
-    return games
-};
 export default function SnakeGame() {
+  async function connectWebSocket() {
+    return new Promise((resolve, reject) => {
+      const ws = new WebSocket("ws://127.0.0.1:8000/ws/evolve");
+  
+      ws.onopen = () => {
+        console.log("WebSocket connection opened");
+        resolve(ws);
+      };
+  
+      ws.onerror = (event) => {
+        console.error("WebSocket error:", event);
+        reject(event);
+      };
+    });
+  }
+
+  async function handleMessage(data) {
+    const parsedData = JSON.parse(data);
+    console.log(parsedData);
+    setFrames(frames.concat(parsedData));
+  };
+
+  const [isConnected, setIsConnected] = useState(false);
+  
+
+
+
   const Node = () => {
     return(
       <div className=" hidden-layer d-flex w-100 align-items-center">
@@ -47,7 +48,6 @@ export default function SnakeGame() {
 
   const handleNodeChange = (event) => {
     let node = event.target;
-    let parent = node.parentNode;
     let value = node.value;
     if (value < 1) {
       const index = hiddenLayers.indexOf(node);
@@ -94,6 +94,7 @@ export default function SnakeGame() {
       scrollToSection(event,"snake-game")
     }
   }
+  
 
   useEffect(() => {
     evolveButtonRef.current.innerHTML = "Evolve";
@@ -119,6 +120,7 @@ export default function SnakeGame() {
       let mutation_rate = document.getElementsByName("mutation_rate")[0].value;
       let hidden_layer_nodes = document.getElementsByName("hidden_layer");
       let hidden_layer_values = [];
+
       for (let i = 0; i < hidden_layer_nodes.length; i++) {
         hidden_layer_values.push(hidden_layer_nodes[i].value ? hidden_layer_nodes[i].value : '3');
       }
@@ -141,13 +143,33 @@ export default function SnakeGame() {
       if (hidden_layer_values.length == 0) {
         hidden_layer_values = null;
       }
-
-
-      await evolve(max_generations, population_size, max_frames_training, max_frames_playback, mutation_rate, hidden_layer_values).then((inc_frames) => {
-        setFrames(inc_frames);
-      });
-
+      let payload = { 
+        "max_generations": max_generations,
+        "population_size": population_size,
+        "max_frames_training": max_frames_training,
+        "max_frames_playback": max_frames_playback,
+        "mutation_rate": mutation_rate,
+      }
+      if (hidden_layer_values) {
+        payload["network_arch"] = hidden_layer_values;
+      }
       setFrameId(0);
+
+      let ws = null;
+      if (isConnected !== true) {
+        const setupWebSocket = async () => {
+          ws = await connectWebSocket();
+          setIsConnected(true);
+          ws.onmessage = async (event) => handleMessage(event.data);
+          return ws;
+        }
+        setupWebSocket().then(
+          async () => await ws.send(
+            JSON.stringify(payload)
+            )
+        );
+      }
+
       evolveButtonRef.current.innerHTML = "Complete!";
       playRef.current.classList.remove("disabled");
       loaderRef.current.classList.add("invisible");
