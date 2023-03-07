@@ -10,7 +10,8 @@ export default function SnakeGame() {
 
   async function connectWebSocket() {
     return new Promise((resolve, reject) => {
-      const ws = new WebSocket("ws://127.0.0.1:8000/ws/evolve");
+      let url =getServerUrl("ws/evolve")
+      const ws = new WebSocket(url);
   
       ws.onopen = () => {
         console.log("WebSocket connection opened");
