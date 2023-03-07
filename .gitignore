@@ -1,2 +1,8 @@
 server/server_env
 env/
+
+client/.next
+client/.next
+client/node_modules
+
+client/utils/get_server_url.js

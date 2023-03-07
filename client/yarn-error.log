@@ -1,0 +1,55 @@
+Arguments: 
+  /opt/homebrew/Cellar/node/19.5.0/bin/node /opt/homebrew/bin/yarn add next-plugin-websocket
+
+PATH: 
+  /opt/homebrew/opt/pyqt@5/5.15.4_1/bin:/opt/homebrew/opt/qt@5/bin:/opt/homebrew/bin:/Users/firatkizilboga/miniforge3/yes/bin:/Users/firatkizilboga/miniforge3/yes/condabin:/Library/Frameworks/Python.framework/Versions/3.9/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/share/dotnet:/Users/firatkizilboga/.dotnet/tools:/Library/Apple/usr/bin:/Library/Frameworks/Mono.framework/Versions/Current/Commands
+
+Yarn version: 
+  1.22.19
+
+Node version: 
+  19.5.0
+
+Platform: 
+  darwin arm64
+
+Trace: 
+  Error: connect ENETUNREACH 104.16.17.35:443 - Local (0.0.0.0:61285)
+      at internalConnect (node:net:1059:16)
+      at defaultTriggerAsyncIdScope (node:internal/async_hooks:465:18)
+      at emitLookup (node:net:1321:9)
+      at /opt/homebrew/lib/node_modules/yarn/lib/cli.js:103587:28
+      at /opt/homebrew/lib/node_modules/yarn/lib/cli.js:103496:13
+      at module.exports.RawTask.call (/opt/homebrew/lib/node_modules/yarn/lib/cli.js:79584:19)
+      at flush (/opt/homebrew/lib/node_modules/yarn/lib/cli.js:79666:29)
+      at process.processTicksAndRejections (node:internal/process/task_queues:77:11)
+
+npm manifest: 
+  {
+    "name": "client",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+      "dev": "next dev -p 80",
+      "build": "next build",
+      "start": "next start -p 80",
+      "lint": "next lint"
+    },
+    "dependencies": {
+      "@next/font": "13.1.6",
+      "bootstrap": "^5.2.3",
+      "eslint": "8.34.0",
+      "eslint-config-next": "13.1.6",
+      "next": "13.1.6",
+      "nextjs-websocket": "^1.0.11",
+      "react": "18.2.0",
+      "react-dom": "18.2.0",
+      "ws": "^8.12.1"
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
