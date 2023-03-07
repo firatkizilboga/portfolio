@@ -5,6 +5,9 @@ import React from "react";
 
 
 export default function SnakeGame() {
+
+  const [playbacks, setPlaybacks] = useState([]);
+
   async function connectWebSocket() {
     return new Promise((resolve, reject) => {
       const ws = new WebSocket("ws://127.0.0.1:8000/ws/evolve");
@@ -23,14 +26,17 @@ export default function SnakeGame() {
 
   async function handleMessage(data) {
     const parsedData = JSON.parse(data);
-    console.log(parsedData);
-    setFrames(frames.concat(parsedData));
-  };
+    let new_playbacks = playbacks;
+
+    for(let i = 0; i < parsedData.length; i++){
+        new_playbacks.push(parsedData[i]);
+      }
+    setPlaybacks(new_playbacks);
+    
+    };
+
 
   const [isConnected, setIsConnected] = useState(false);
-  
-
-
 
   const Node = () => {
     return(
@@ -40,7 +46,6 @@ export default function SnakeGame() {
       </div>
     )
   }
-  
   
   const addNode = (event) => {
     setHiddenLayers([...hiddenLayers, <Node key = {hiddenLayers.length} />]);
@@ -60,8 +65,6 @@ export default function SnakeGame() {
 
   let width = 10;
   let height = 10;
-
-  let [frames, setFrames] = useState([]);
   //create a matrix full of zeros
   let initial_frame = Array.from(Array(height), () => new Array(width).fill(0));
   let [frame, setFrame] = useState(initial_frame);
@@ -85,7 +88,7 @@ export default function SnakeGame() {
 
   const [isPlaying, setIsPlaying] = useState(false)
   let playHandleClick = (event) => {
-    if (frames.length  == 1) {
+    if (playbacks.length  == 1) {
       return;
     }else if (isPlaying) {
       setIsPlaying(false);
@@ -155,43 +158,40 @@ export default function SnakeGame() {
       }
       setFrameId(0);
 
-      let ws = null;
+      let ws = null;    
       if (isConnected !== true) {
         const setupWebSocket = async () => {
           ws = await connectWebSocket();
           setIsConnected(true);
-          ws.onmessage = async (event) => handleMessage(event.data);
-          return ws;
-        }
+          ws.onmessage = async (event) =>{await handleMessage(event.data)};
+        };
         setupWebSocket().then(
-          async () => await ws.send(
-            JSON.stringify(payload)
-            )
+          async () => await ws.send(JSON.stringify(payload))
         );
       }
-
       evolveButtonRef.current.innerHTML = "Complete!";
       playRef.current.classList.remove("disabled");
       loaderRef.current.classList.add("invisible");
     }
   }
-  
+  const [playbackSpeed, setPlaybackSpeed] = useState(30);
   useEffect(() => {
-      const interval = setInterval(() => {
-        if (frameId < frames.length && isPlaying) {
-          let current_frame = frames[frameId]
-          setFrame(current_frame);
-          setFrameId(frameId+1);
-          //sleep for 1 second
-        }else{
-          clearInterval(interval);
-        }
-      }, 100);
-      return () => {
+    const interval = setInterval(() => {
+      if (frameId < playbacks.length && isPlaying) {
+        let current_frame = playbacks[frameId]
+        setFrame(current_frame);
+        setFrameId(frameId + 1);
+                //sleep for 1 second
+      }else{
         clearInterval(interval);
-      };
+      }
+    }, playbackSpeed);
+    return () => {
+      clearInterval(interval);
+    };
 
-  }, [isPlaying, frameId]);
+}, [isPlaying,frameId,playbackSpeed]);
+
 
   return (
     <div className="p-5 d-flex flex-wrap justify-content-evenly align-items-left">
@@ -216,6 +216,13 @@ export default function SnakeGame() {
                 </div>
                 )})}
           </div>
+          Playback Rate:
+          <input type="number" min={10} placeholder="30" onChange={
+            (event) => {
+              setPlaybackSpeed(event.target.value);
+            }
+          }/>
+
           <br />
         </div>
         <div className="snake-game-options">

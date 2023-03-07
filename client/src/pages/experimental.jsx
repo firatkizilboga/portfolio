@@ -41,8 +41,8 @@ export default function index() {
           max_frames_playback: 600,
           max_frames_training: 600, }))
       );
-
     }
+    
   });
 
   return (

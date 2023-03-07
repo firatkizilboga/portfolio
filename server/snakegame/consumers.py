@@ -24,6 +24,7 @@ class EvolutionConsumer(JsonWebsocketConsumer):
         while self.evolver.generation < self.evolver.max_generations:
             frames = self.evolver.step()
             self.send_json(frames)
+            self.evolver.print_stats()
     
     def disconnect(self, close_code):
         self.close()
