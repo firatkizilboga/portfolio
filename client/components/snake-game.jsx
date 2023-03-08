@@ -191,7 +191,7 @@ export default function SnakeGame() {
       clearInterval(interval);
     };
 
-}, [isPlaying,frameId,playbackSpeed]);
+}, [isPlaying,frameId,playbackSpeed,playbacks]);
 
 
   return (
